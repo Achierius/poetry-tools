@@ -63,7 +63,8 @@ executable skald
   build-depends:       base >=4.9 && <4.10,
                        filepath, directory, mtl, options,
                        optparse-applicative,
-                       regexpr
+                       regex-pcre-builtin,
+                       raw-strings-qq
   
   -- Directories containing source files.
   hs-source-dirs:      src

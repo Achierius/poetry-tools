@@ -1,7 +1,10 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 module UserIO where
 
 -- Temporarily using code from the following tutorial:
 -- https://thoughtbot.com/blog/refactoring-to-a-monad-transformer-stack
+
 
 import           Control.Monad.Writer
 import           Data.Bool
@@ -10,25 +13,22 @@ import           Data.Maybe
 import qualified Data.Bifunctor as Bifunctor
 import qualified Control.Exception as Exception
 import           Options.Applicative
-import           Text.RegexPR
+import           Text.Regex.PCRE
+import           Text.RawString.QQ
 -- TODO: Migrate to regex-pcre instead
 
 -- data
 
-  -- Note: each CSV line entry is ordered as follows:
-  --    ENGLISH,/IPA/
-  -- this regex uses lookbehind/lookahead to extract the IPA
-engIPALoc = "dist/resources/en/en_US.csv"
-engIPARegex = "(?<=/).+(?=/)"
-regDflt = (("", ("", "")), [])
--- TODO: Make regDflt a function String -> (that tuple thing)
+engIPALoc = "dist/resources/en/en_US_Processed.csv"
+engIPARegex :: String
+engIPARegex = [r|(?<=,)(.+)|]
 
 englishVowels = ['ɑ', 'ɪ', 'ə', 'ɔ', 'æ', 'ʒ', 'ʊ', 'i', 'u', 'e']
 engVowelsRegx = "[" ++ englishVowels ++ "]"
 
 -- types
 
-newtype IPAString = IPAString String deriving (Eq)
+newtype IPAString = IPAString String deriving (Show, Eq)
 
 data Options = Options
     { oStdIn :: Bool, oTarget :: Maybe String }
@@ -47,8 +47,8 @@ getIPALine o = do
     let lineNo = read option :: Int
     dict <- readFile engIPALoc
     let line = lines dict !! lineNo
-    let capturedIPA = fromMaybe regDflt (matchRegexPR engIPARegex line)
-    return (fst . fst $ capturedIPA)
+    let capturedIPA = line =~ engIPARegex :: [[String]]
+    return (head . head $ capturedIPA)
 
 -- tutorial code for handling CLI and file IO
 
