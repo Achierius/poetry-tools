@@ -30,7 +30,9 @@ engVowelsRegx = "[" ++ englishVowels ++ "]"
 
 -- types
 
-newtype IPAString = IPAString String deriving (Show, Eq)
+newtype IPAString = IPAString String deriving (Eq)
+instance Show IPAString where
+    show (IPAString a) = a
 
 data Options = Options
     { oStdIn :: Bool, oTarget :: Maybe String }
@@ -45,16 +47,16 @@ runProgram o = do
     wordRAW <- getRAWOnLine lineNum
     putStrLn ("Word " ++ lineStr ++ ":")
     putStrLn ("  English Raw: \"" ++ wordRAW ++ "\"")
-    putStrLn ("  English IPA: /" ++ wordIPA ++ "/")
+    putStrLn ("  English IPA: /" ++ show wordIPA ++ "/")
 
   -- IPA lookup from english dictionary
 
-getIPAOnLine :: Int -> IO String
+getIPAOnLine :: Int -> IO IPAString
 getIPAOnLine lineNo = do
     dict <- readFile engDicLoc
     let line = lines dict !! lineNo
     let capturedIPA = line =~ engIPARegex :: [[String]]
-    return (head . head $ capturedIPA)
+    return (IPAString . head . head $ capturedIPA)
 
   -- raw text lookup from english dictionary
 
