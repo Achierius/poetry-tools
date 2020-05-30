@@ -1,4 +1,9 @@
 module Main where
 
+import UserIO
+
 main :: IO ()
-main = putStrLn "Hello, Skáld!"
+main = runProgram =<< parseCLI
+
+-- main :: IO ()
+-- main = putStrLn "Hello, Skáld!"
