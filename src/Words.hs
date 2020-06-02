@@ -6,8 +6,8 @@ import           Data.String
 import           Text.RawString.QQ
 import qualified Data.Text                  as T
 import qualified Data.Text.Lazy             as TL
-import qualified Data.ByteString.Lazy       as B
-import qualified Data.ByteString            as BS
+import qualified Data.ByteString            as B
+import qualified Data.ByteString.Lazy       as BL
 import qualified Data.ByteString.Lazy.UTF8  as BLU
 
 
@@ -24,13 +24,13 @@ stanzaSeparator   = "\n\n"
 data Language = English | Icelandic | Swedish | OldEnglish
                 deriving (Eq, Show, Read, Enum)
 
-data Rule = Nothing deriving (Eq)
+data Rule = RuleNothing deriving (Eq)
 
 -- TODO later; only necessary when we want to start typeclassing
 -- newtype IPAWord = IPAWord BLU.ByteString deriving (Eq, Show, Read)
 -- instance Phonetic IPAWord where
 --     toIPA = id
-
+type IPAString = BLU.ByteString
 -- TODO make polymorphic
 type HalfLine = [T.Text]
 
@@ -79,6 +79,6 @@ exL3 = Line exHL5 exHL6
 exSZ1 = Stanza [exL1, exL2]
 exSZ2 = Stanza []
 exSZ3 = Stanza [exL3]
-exPoem = Poem [exSZ1, exSZ2, exSZ3] (Words.Nothing) English
+exPoem = Poem [exSZ1, exSZ2, exSZ3] (RuleNothing) English
 
 

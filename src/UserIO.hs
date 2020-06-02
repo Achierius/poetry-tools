@@ -13,6 +13,8 @@ import           Data.Maybe
 import           Data.List
 import qualified Data.Bifunctor as Bifunctor
 import qualified Control.Exception as Exception
+import           Words as W
+import qualified Data.ByteString.Lazy.UTF8 as BLU
 import           Options.Applicative
 import           Text.Regex.PCRE
 import           Text.RawString.QQ
@@ -32,9 +34,6 @@ engVowelsRegx = "[" ++ englishVowels ++ "]"
 
 -- types
 
-newtype IPAString = IPAString String deriving (Eq)
-instance Show IPAString where
-    show (IPAString a) = a
 
 data Options = Options
     { oStdIn :: Bool, oTarget :: Maybe String }
@@ -77,7 +76,7 @@ getIPAOnLine lineNo = do
     dict <- readFile engDicLoc
     let line = lines dict !! lineNo
     let capturedIPA = line =~ engIPARegex :: String
-    return (IPAString capturedIPA)
+    return (BLU.fromString capturedIPA)
 
   -- raw text lookup from english dictionary
 
