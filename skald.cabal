@@ -64,7 +64,11 @@ executable skald
                        filepath, directory, mtl, options,
                        optparse-applicative,
                        regex-pcre-builtin,
-                       raw-strings-qq
+                       raw-strings-qq,
+                       utf8-string,
+                       array,
+                       bytestring,
+                       text
   
   -- Directories containing source files.
   hs-source-dirs:      src
