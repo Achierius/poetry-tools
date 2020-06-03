@@ -21,7 +21,7 @@ lineSeparator     = "\n"
 stanzaSeparator   = "\n\n"
 
 
-data Language = English | Icelandic | Swedish | OldEnglish
+data Language = English | Icelandic | Swedish | German
                 deriving (Eq, Show, Read, Enum)
 
 data Rule = RuleNothing deriving (Eq)
@@ -80,5 +80,3 @@ exSZ1 = Stanza [exL1, exL2]
 exSZ2 = Stanza []
 exSZ3 = Stanza [exL3]
 exPoem = Poem [exSZ1, exSZ2, exSZ3] (RuleNothing) English
-
-

@@ -45,9 +45,9 @@ data Options = Options
 runProgram :: Options -> IO ()
 runProgram o = do
     let word = fromMaybe "" (oTarget o)
-    lineM <- dictLookup word
+    lineM <- dictLookup English word
     let lineNo = fromMaybe 0 lineM
-    wordIPA <- getIPAOnLine lineNo
+    wordIPA <- getIPAOnLine English lineNo
     let output = case lineM of
             Just x  -> "IPA for " ++ word ++ ":" ++ 
                        "  /" ++ show wordIPA ++ "/"
@@ -62,30 +62,38 @@ runProgram o = do
     -- putStrLn ("  English Raw: \"" ++ wordRAW ++ "\"")
     -- putStrLn ("  English IPA: /" ++ show wordIPA ++ "/")
 
-dictLookup :: String -> IO (Maybe Int)
-dictLookup str = do
-    dict <- readFile engRAWLoc
-    let dictLines = lines dict
-    let lineNum = elemIndex str dictLines
+dictLookup :: W.Language -> String -> IO (Maybe Int)
+dictLookup lang str = do
+    decoratedDict <- readFile (fetchDictionary lang)
+    let dictLines = lines decoratedDict
+    let rawDict = concat [[m] |
+                          (m, n) <- map (break (','==)) dictLines]
+    let lineNum = elemIndex str rawDict
     return lineNum
 
-  -- IPA lookup from english dictionary
+  -- IPA lookup from any dictionary
 
-getIPAOnLine :: Int -> IO IPAString
-getIPAOnLine lineNo = do
-    dict <- readFile engDicLoc
+getIPAOnLine :: W.Language -> Int -> IO IPAString
+getIPAOnLine lang lineNo = do
+    dict <- readFile (fetchDictionary lang)
     let line = lines dict !! lineNo
     let capturedIPA = line =~ engIPARegex :: String
     return (BLU.fromString capturedIPA)
 
-  -- raw text lookup from english dictionary
+  -- raw text lookup from any dictionary
 
-getRAWOnLine :: Int -> IO String
-getRAWOnLine lineNo = do
-    dict <- readFile engDicLoc
+getRAWOnLine :: W.Language -> Int -> IO String
+getRAWOnLine lang lineNo = do
+    dict <- readFile (fetchDictionary lang)
     let line = lines dict !! lineNo
     let capturedIPA = line =~ engRAWRegex :: String
     return capturedIPA
+
+fetchDictionary :: W.Language -> String
+fetchDictionary English = "dist/resources/en/en_US_Processed.csv"
+fetchDictionary German = "dist/resources/de/de_Processed.csv"
+fetchDictionary Icelandic = "dist/resources/is/is_Processed.csv"
+fetchDictionary Swedish = "dist/resources/sv/sv_Processed.csv"
 
 -- tutorial code for handling CLI and file IO
 
