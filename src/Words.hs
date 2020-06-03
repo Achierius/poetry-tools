@@ -9,6 +9,7 @@ import qualified Data.Text.Lazy             as TL
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Lazy       as BL
 import qualified Data.ByteString.Lazy.UTF8  as BLU
+import           Languages
 
 
 -- TODO later; fromIPA is nontrivial
@@ -20,9 +21,9 @@ halfLineSeparator = "\t\t"
 lineSeparator     = "\n"
 stanzaSeparator   = "\n\n"
 
+englishVowels = ['ɑ', 'ɪ', 'ə', 'ɔ', 'æ', 'ʒ', 'ʊ', 'i', 'u', 'e']
+engVowelsRegx = "[" ++ englishVowels ++ "]"
 
-data Language = English | Icelandic | Swedish | German
-                deriving (Eq, Show, Read, Enum)
 
 data Rule = RuleNothing deriving (Eq)
 
@@ -30,7 +31,6 @@ data Rule = RuleNothing deriving (Eq)
 -- newtype IPAWord = IPAWord BLU.ByteString deriving (Eq, Show, Read)
 -- instance Phonetic IPAWord where
 --     toIPA = id
-type IPAString = BLU.ByteString
 -- TODO make polymorphic
 type HalfLine = [T.Text]
 
