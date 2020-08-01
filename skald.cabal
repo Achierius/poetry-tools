@@ -57,20 +57,20 @@ executable skald
   other-modules:       UserIO
                        Words
                        Languages
+                       Dictionaries
   
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.9 && <4.10,
+  build-depends:       base,
                        filepath, directory, mtl, options,
                        optparse-applicative,
                        regex-pcre-builtin,
                        raw-strings-qq,
-                       utf8-string,
+                       utf8-string, bytestring, text,
                        array,
-                       bytestring,
-                       text
+                       file-embed
   
   -- Directories containing source files.
   hs-source-dirs:      src
