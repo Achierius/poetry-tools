@@ -26,10 +26,15 @@ data Language = English
 {- types for linguistic text -}
 
 newtype LangString (a::Language) = LangString T.Text
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+instance Show (LangString (l :: Language)) where
+  show (LangString x) = T.unpack x
 
 newtype IPAString = IPAString T.Text
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+instance Show IPAString where
+  show (IPAString x) = T.unpack x
+
 
 
 {- type safety
