@@ -6,12 +6,13 @@
 {-# LANGUAGE QuasiQuotes                #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..),
-                  LangString(..), IPAString(..),
+                  LangString(..), IPAString(..), lWords, lWordsIpa,
                   reflectLang, extractLang) where
 
 import qualified Data.Text as T
 import qualified Text.RawString.QQ as R
 import qualified Text.Regex.PCRE
+import qualified Data.String as S
 import qualified Data.Kind
 
 {- core language types -}
@@ -26,15 +27,24 @@ data Language = English
 {- types for linguistic text -}
 
 newtype LangString (a::Language) = LangString T.Text
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, S.IsString)
 instance Show (LangString (l :: Language)) where
   show (LangString x) = T.unpack x
 
 newtype IPAString = IPAString T.Text
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, S.IsString)
 instance Show IPAString where
   show (IPAString x) = T.unpack x
 
+{- helper functions for language strings -}
+
+-- |words for LangString
+lWords :: LangString l -> [LangString l]
+lWords (LangString x) = map LangString $ T.words x
+
+-- |words for IPAString
+lWordsIpa :: IPAString -> [IPAString]
+lWordsIpa (IPAString x) = map IPAString $ T.words x
 
 
 {- type safety
