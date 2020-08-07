@@ -1,5 +1,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE GADTs #-}
 
 module Dictionaries where
 
@@ -15,36 +21,52 @@ import Languages
 
 -- types
 
-type DictEntry = (LangString, LangString)
-data Dictionary = Dictionary Language [DictEntry] -- [(T.Text, T.Text)]
-data RawDictionary = RawDictionary Language B.ByteString
+data DictEntry (a :: Language) = DictEntry (LangString a) IPAString
+  deriving (Eq, Ord)
+
+data Dict (a :: Language) = Dict [DictEntry a] -- [(T.Text, T.Text)]
+  deriving (Eq, Ord)
+
+data RawDict (a :: Language) = RawDict B.ByteString
+
+data TupleDict (a :: Language) = TupleDict [(T.Text, T.Text)]
 
 -- embed dictionaries at compile-time using Template Haskell
 
-getRawDictionary :: Language -> RawDictionary
-getRawDictionary English   = RawDictionary English $(Embed.embedFile
-                                   "dist/resources/en/en_US_Processed.csv")
-getRawDictionary German    = RawDictionary English $(Embed.embedFile
-                                   "dist/resources/de/de_Processed.csv")
-getRawDictionary Icelandic = RawDictionary English $(Embed.embedFile
-                                   "dist/resources/is/is_Processed.csv")
-getRawDictionary Swedish   = RawDictionary English $(Embed.embedFile
-                                   "dist/resources/sv/sv_Processed.csv")
+getRawDict :: SLanguage l -> RawDict l
+getRawDict SEnglish   = RawDict @'English $(Embed.embedFile
+                                 "dist/resources/en/en_US_Processed.csv")
+getRawDict SGerman    = RawDict @'German $(Embed.embedFile
+                                 "dist/resources/de/de_Processed.csv")
+getRawDict SIcelandic = RawDict @'Icelandic $(Embed.embedFile
+                                 "dist/resources/is/is_Processed.csv")
+getRawDict SSwedish   = RawDict @'Swedish $(Embed.embedFile
+                                 "dist/resources/sv/sv_Processed.csv")
+
+joinDict :: Dict l -> Dict l -> Dict l
+joinDict (Dict x) (Dict y) = Dict (x ++ y)
+
+catDict :: Dict l -> DictEntry l -> Dict l
+catDict (Dict []) y = Dict [y]
+catDict (Dict x)  y = Dict (y:x)
 
 -- wrapper for externally fetching dictionaries
--- TODO: make this "cache" already-processed dictionaries in some way?
---       or will haskell do that on its own...?
-getDictionary :: Language -> Dictionary
-getDictionary = processDict . getRawDictionary
+getDict :: SLanguage l -> Dict l
+getDict = processDict . tupleizeDict . getRawDict
 
 -- core functionality
 
+processDict :: TupleDict e -> Dict e
+processDict (TupleDict []) = Dict []
+processDict (TupleDict (x:xs)) = catDict (processDict (TupleDict xs))
+                                       (DictEntry
+                                         (LangString $ fst x)
+                                         (IPAString $ snd x))
+
 -- TODO: strip '/' from IPA
 -- TODO: handle entries with multiple IPA definitions
-processDict :: RawDictionary -> Dictionary
-processDict (RawDictionary lang bytes) = 
-                           Dictionary
-                             lang
+tupleizeDict :: RawDict e -> TupleDict e
+tupleizeDict (RawDict bytes) = TupleDict
                              (map
                                (\(x, y) -> (x, T.drop 1 y))
                                (map
@@ -52,23 +74,22 @@ processDict (RawDictionary lang bytes) =
                                  (T.lines (TE.decodeUtf8 bytes))))
 
 -- could we improve runtime if we guarantee dict sortedness
---   maybe add an attribute to the Dictionary type?
-
--- need to add language annotation to LangStrings...
-
+--   maybe add an attribute to the Dict type?
 
 -- find entry of word in dictionary
-dictLookup :: Dictionary -> LangString -> Maybe DictEntry
-dictLookup (Dictionary _ vals) str = LST.find ((== str) . fst) vals
+dictLookup :: Dict e -> LangString e -> Maybe (DictEntry e)
+dictLookup (Dict vals) str = LST.find ((== str) . dictEntryLang) vals
 
--- find entry with equivalent ipa in dictionary
-dictLookupIPA :: Dictionary -> LangString -> Maybe DictEntry
-dictLookupIPA (Dictionary _ vals) str = LST.find ((== str) . snd) vals
+-- -- find entry with equivalent ipa in dictionary
+-- dictLookupIPA :: Dict e -> IPAString -> Maybe (DictEntry e)
+-- dictLookupIPA (Dict vals) str = LST.find ((== str) . dictEntryIPA) vals
 
--- extract IPA of given dictionary entry
-dictEntryIPA :: DictEntry -> IPAString
-dictEntryIPA = snd
+-- -- extract IPA of given dictionary entry
+dictEntryIPA :: DictEntry e -> IPAString
+dictEntryIPA (DictEntry _ y) = y
 
 -- extract raw language text of given dictionary entry
-dictEntryLang :: DictEntry -> LangString
-dictEntryLang = fst
+dictEntryLang :: DictEntry e -> LangString e
+dictEntryLang (DictEntry x _) = x
+
+nilDictEntry = DictEntry (LangString "") (IPAString "")

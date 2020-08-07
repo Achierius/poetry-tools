@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE DataKinds         #-}
 
 module UserIO where
 
@@ -25,14 +27,17 @@ data Options = Options
 runProgram :: Options -> IO ()
 runProgram o = do
     let word = T.pack $ fromMaybe "" (oTarget o)
-    let dict = getDictionary English
-    let entry = dictLookup dict word
+    let dict = getDict SEnglish
+    let entry = dictLookup dict (LangString @'English word)
+    let ipa = x where (IPAString x) = dictEntryIPA (fromMaybe
+                                                      nilDictEntry
+                                                      entry)
     let output = case entry of
-            Just x  -> "IPA for " <> word <> ":" <> 
-                       "  /" <> (dictEntryIPA x) <> "/"
+            Just x  -> "IPA for " <> word <> ": " <>
+                       "  /" <> ipa <> "/"
             Nothing -> "Failed to lookup word " <>
                        "\"" <> word <> "\""
-    Data.Text.IO.putStrLn output                   
+    Data.Text.IO.putStrLn output
 
 -- runProgram :: Options -> IO ()
 -- runProgram o = do
@@ -41,7 +46,7 @@ runProgram o = do
 --     let lineNo = fromMaybe 0 lineM
 --     wordIPA <- getIPAOnLine English lineNo
 --     let output = case lineM of
---             Just x  -> "IPA for " ++ word ++ ":" ++ 
+--             Just x  -> "IPA for " ++ word ++ ":" ++
 --                        "  /" ++ show wordIPA ++ "/"
 --             Nothing -> "Failed to lookup word " ++
 --                        "\"" ++ word ++ "\""

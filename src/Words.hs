@@ -11,12 +11,6 @@ import qualified Data.ByteString.Lazy       as BL
 import qualified Data.ByteString.Lazy.UTF8  as BLU
 import           Languages
 
-
--- TODO later; fromIPA is nontrivial
--- class (Show a) => Phonetic a where 
--- toIPA :: IO a -> IO IPAWord
--- fromIPA :: IO IPAWord -> IO a
-
 halfLineSeparator = "\t\t"
 lineSeparator     = "\n"
 stanzaSeparator   = "\n\n"
@@ -27,11 +21,6 @@ engVowelsRegx = "[" ++ englishVowels ++ "]"
 
 data Rule = RuleNothing deriving (Eq)
 
--- TODO later; only necessary when we want to start typeclassing
--- newtype IPAWord = IPAWord BLU.ByteString deriving (Eq, Show, Read)
--- instance Phonetic IPAWord where
---     toIPA = id
--- TODO make polymorphic
 type HalfLine = [T.Text]
 
 data Line = Line { firstLine :: HalfLine
