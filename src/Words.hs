@@ -9,6 +9,7 @@ import qualified Data.Text.Lazy             as TL
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Lazy       as BL
 import qualified Data.ByteString.Lazy.UTF8  as BLU
+
 import           Languages
 
 halfLineSeparator = "\t\t"
