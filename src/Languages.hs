@@ -1,24 +1,20 @@
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
 
-module Languages where
+module Languages (Language(..), SLanguage(..), CLanguage(..),
+                  LangString(..), IPAString(..),
+                  reflectLang, extractLang) where
 
-import           Data.Maybe
-import qualified Data.List as LST
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy.UTF8 as BLU
+import qualified Text.RawString.QQ as R
+import qualified Text.Regex.PCRE
 import qualified Data.Kind
-import           Text.Regex.PCRE
-import           Text.RawString.QQ
 
--- core language type
+{- core language types -}
 
 data Language = English
               | Icelandic
@@ -26,7 +22,8 @@ data Language = English
               | German
               deriving (Eq, Show, Read, Enum)
 
--- types for linguistic text
+
+{- types for linguistic text -}
 
 newtype LangString (a::Language) = LangString T.Text
   deriving (Eq, Ord, Show)
@@ -34,8 +31,11 @@ newtype LangString (a::Language) = LangString T.Text
 newtype IPAString = IPAString T.Text
   deriving (Eq, Ord, Show)
 
--- singleton implementation
--- requires -XGADTs, -XDataKinds
+
+{- type safety
+ - implements singleton to plug into the phantom types defined above
+ - requires -XGADTs, -XDataKinds
+ -}
 
 class CLanguage l where
   language :: SLanguage l
@@ -56,22 +56,28 @@ instance CLanguage 'Swedish where
   language = SSwedish
 
 
--- functions for runtime reflection on the language underlying a value
--- requires -XKindSignatures
+{- functions for runtime reflection on the language underlying a value
+ - requires -XKindSignatures
+ -}
 
-reflectLanguage :: SLanguage l -> (a :: Language -> *) l -> Language
-reflectLanguage SEnglish   _ = English
-reflectLanguage SGerman    _ = German
-reflectLanguage SSwedish   _ = Swedish
-reflectLanguage SIcelandic _ = Icelandic
+-- |retrieve Language type at runtime from SLanguage witness
+reflectLang :: SLanguage l -> (a :: Language -> *) l -> Language
+reflectLang SEnglish   _ = English
+reflectLang SGerman    _ = German
+reflectLang SSwedish   _ = Swedish
+reflectLang SIcelandic _ = Icelandic
 
+-- |take any phantom type parameterized on a Language data type
+--  and return the phantom parameter Language value
 extractLang :: CLanguage l => (a :: Language -> *) l -> Language
-extractLang = reflectLanguage language
+extractLang = reflectLang language
 
--- regexes for splitting raw & ipa from csv dictionaries; obsolete?
--- requires -XQuasiQuotes
+
+{- regexes for splitting raw & ipa from csv dictionaries; obsolete?
+ - requires -XQuasiQuotes
+ -}
 
 csvIPARegex :: String
-csvIPARegex = [r|(?<=,)(.+)|]
+csvIPARegex = [R.r|(?<=,)(.+)|]
 csvRAWRegex :: String
-csvRAWRegex = [r|^(.+)(?=,)|]
+csvRAWRegex = [R.r|^(.+)(?=,)|]
