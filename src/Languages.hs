@@ -4,6 +4,7 @@
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..),
                   LangString(..), IPAString(..), lWords, lWordsIpa,
@@ -26,9 +27,9 @@ data Language = English
 
 {- types for linguistic text -}
 
-newtype LangString (a::Language) = LangString T.Text
+newtype LangString (a∷Language) = LangString T.Text
   deriving (Eq, Ord, S.IsString)
-instance Show (LangString (l :: Language)) where
+instance Show (LangString (l ∷ Language)) where
   show (LangString x) = T.unpack x
 
 newtype IPAString = IPAString T.Text
@@ -39,11 +40,11 @@ instance Show IPAString where
 {- helper functions for language strings -}
 
 -- |words for LangString
-lWords :: LangString l -> [LangString l]
+lWords ∷ LangString l → [LangString l]
 lWords (LangString x) = map LangString $ T.words x
 
 -- |words for IPAString
-lWordsIpa :: IPAString -> [IPAString]
+lWordsIpa ∷ IPAString → [IPAString]
 lWordsIpa (IPAString x) = map IPAString $ T.words x
 
 
@@ -53,13 +54,13 @@ lWordsIpa (IPAString x) = map IPAString $ T.words x
  -}
 
 class CLanguage l where
-  language :: SLanguage l
+  language ∷ SLanguage l
 
-data SLanguage :: Language -> Data.Kind.Type where
-  SEnglish   :: SLanguage 'English
-  SIcelandic :: SLanguage 'Icelandic
-  SSwedish   :: SLanguage 'Swedish
-  SGerman    :: SLanguage 'German
+data SLanguage ∷ Language → Data.Kind.Type where
+  SEnglish   ∷ SLanguage 'English
+  SIcelandic ∷ SLanguage 'Icelandic
+  SSwedish   ∷ SLanguage 'Swedish
+  SGerman    ∷ SLanguage 'German
 
 instance CLanguage 'English where
   language = SEnglish
@@ -76,7 +77,7 @@ instance CLanguage 'Swedish where
  -}
 
 -- |retrieve Language type at runtime from SLanguage witness
-reflectLang :: SLanguage l -> (a :: Language -> *) l -> Language
+reflectLang ∷ SLanguage l → (a ∷ Language → ★) l → Language
 reflectLang SEnglish   _ = English
 reflectLang SGerman    _ = German
 reflectLang SSwedish   _ = Swedish
@@ -84,7 +85,7 @@ reflectLang SIcelandic _ = Icelandic
 
 -- |take any phantom type parameterized on a Language data type
 --  and return the phantom parameter Language value
-extractLang :: CLanguage l => (a :: Language -> *) l -> Language
+extractLang ∷ CLanguage l ⇒ (a ∷ Language → ★) l → Language
 extractLang = reflectLang language
 
 
@@ -92,7 +93,7 @@ extractLang = reflectLang language
  - requires -XQuasiQuotes
  -}
 
-csvIPARegex :: String
+csvIPARegex ∷ String
 csvIPARegex = [R.r|(?<=,)(.+)|]
-csvRAWRegex :: String
+csvRAWRegex ∷ String
 csvRAWRegex = [R.r|^(.+)(?=,)|]
