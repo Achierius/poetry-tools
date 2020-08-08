@@ -6,6 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE UnicodeSyntax       #-}
 
 module Dictionaries (DictEntry(..), Dict(..),
                      getDict, dictJoin, dictAppend, 
@@ -26,29 +27,29 @@ import Languages
 {- core types -}
 
 -- |type of a single Word-IPA correspondence in a Dict
-data DictEntry (a :: Language) = DictEntry (LangString a) IPAString
+data DictEntry (a ∷ Language) = DictEntry (LangString a) IPAString
   deriving (Eq, Ord)
 
 -- |type containing mappings from words in a language to IPA pronounciations;
 --  parameterized on a data-kin of type Language to prevent cross-
 --  language contamination
-data Dict (a :: Language) = Dict [DictEntry a] -- [(T.Text, T.Text)]
+data Dict (a ∷ Language) = Dict [DictEntry a] -- [(T.Text, T.Text)]
   deriving (Eq, Ord)
 
 -- |internal type containing raw underlying dictionary data
-data RawDict (a :: Language) = RawDict Data.ByteString.ByteString
+data RawDict (a ∷ Language) = RawDict Data.ByteString.ByteString
   deriving (Eq, Ord)
 
 -- |internal dictionary type, Language-annotated at the type level,
 --  but with non-annotated text contents.
-data TupleDict (a :: Language) = TupleDict [(T.Text, T.Text)]
+data TupleDict (a ∷ Language) = TupleDict [(T.Text, T.Text)]
   deriving (Eq, Ord)
 
 
 {- compile-time dictionary embeddings -}
 
 -- |internal function for embedding dictionary files with TemplateHaskell
-getRawDict :: SLanguage l -> RawDict l
+getRawDict ∷ SLanguage l → RawDict l
 getRawDict SEnglish   = RawDict @'English $(Embed.embedFile
                                  "dist/resources/en/en_US_Processed.csv")
 getRawDict SGerman    = RawDict @'German $(Embed.embedFile
@@ -62,11 +63,11 @@ getRawDict SSwedish   = RawDict @'Swedish $(Embed.embedFile
 {- functions for processing raw dictionaries into Dict type -}
 
 -- |external wrapper for retrieving the dictionary of any given language
-getDict :: SLanguage l -> Dict l
+getDict ∷ SLanguage l → Dict l
 getDict = processDict . rawDictToTupleDict . getRawDict
 
 -- |create Dict from given TupleDict
-processDict :: TupleDict e -> Dict e
+processDict ∷ TupleDict e → Dict e
 processDict (TupleDict []) = Dict []
 processDict (TupleDict (x:xs)) = dictAppend (processDict (TupleDict xs))
                                          (DictEntry
@@ -76,42 +77,42 @@ processDict (TupleDict (x:xs)) = dictAppend (processDict (TupleDict xs))
 -- TODO: handle entries with multiple IPA definitions
 -- TODO: stop this from breaking on invalid dictionaries xd
 -- |convert RawDict to TupleDict
-rawDictToTupleDict :: RawDict e -> TupleDict e
+rawDictToTupleDict ∷ RawDict e → TupleDict e
 rawDictToTupleDict (RawDict bytes) =
                       TupleDict $ map
-                                    (\(x, y) -> (x, T.drop 1 y))
+                                    (\(x, y) → (x, T.drop 1 y))
                                     (map
-                                      (\x -> head $ T.breakOnAll "," x)
+                                      (\x → head $ T.breakOnAll "," x)
                                       (T.lines (TE.decodeUtf8 bytes)))
 
 
 {- dictionary utility functions -}
 
 -- |concatenate two same-language dictionaries into one
-dictJoin :: Dict l -> Dict l -> Dict l
+dictJoin ∷ Dict l → Dict l → Dict l
 dictJoin (Dict x) (Dict y) = Dict (x ++ y)
 
 -- |append DictEntry to end of given Dict
-dictAppend :: Dict l -> DictEntry l -> Dict l
+dictAppend ∷ Dict l → DictEntry l → Dict l
 dictAppend (Dict []) y = Dict [y]
 dictAppend (Dict x)  y = Dict (y:x)
 
 -- could we improve runtime if we guarantee dict sortedness
 --   maybe add an attribute to the Dict type to improve ord implementation?
 -- |find entry of word in dictionary
-dictLookup :: Dict e -> LangString e -> Maybe (DictEntry e)
+dictLookup ∷ Dict e → LangString e → Maybe (DictEntry e)
 dictLookup (Dict vals) str = LST.find ((== str) . dictEntryLang) vals
 
 -- |find entry with equivalent ipa in dictionary
-dictLookupIPA :: Dict e -> IPAString -> Maybe (DictEntry e)
+dictLookupIPA ∷ Dict e → IPAString → Maybe (DictEntry e)
 dictLookupIPA (Dict vals) str = LST.find ((== str) . dictEntryIPA) vals
 
 -- |extract IPA of given dictionary entry
-dictEntryIPA :: DictEntry e -> IPAString
+dictEntryIPA ∷ DictEntry e → IPAString
 dictEntryIPA (DictEntry _ y) = y
 
 -- |extract raw language text of given dictionary entry
-dictEntryLang :: DictEntry e -> LangString e
+dictEntryLang ∷ DictEntry e → LangString e
 dictEntryLang (DictEntry x _) = x
 
 -- empty values for external use
