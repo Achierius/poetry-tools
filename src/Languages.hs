@@ -7,7 +7,7 @@
 {-# LANGUAGE UnicodeSyntax       #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..),
-                  LangString(..), IPAString(..), lWords, lWordsIpa,
+                  LangString(..), IPAString(..), lWords,
                   reflectLang, extractLang) where
 
 import qualified Data.Text as T
@@ -22,6 +22,7 @@ data Language = English
               | Icelandic
               | Swedish
               | German
+              | Ipa
               deriving (Eq, Show, Read, Enum)
 
 
@@ -32,20 +33,11 @@ newtype LangString (a∷Language) = LangString T.Text
 instance Show (LangString (l ∷ Language)) where
   show (LangString x) = T.unpack x
 
-newtype IPAString = IPAString T.Text
-  deriving (Eq, Ord, S.IsString)
-instance Show IPAString where
-  show (IPAString x) = T.unpack x
-
 {- helper functions for language strings -}
 
 -- |words for LangString
 lWords ∷ LangString l → [LangString l]
 lWords (LangString x) = map LangString $ T.words x
-
--- |words for IPAString
-lWordsIpa ∷ IPAString → [IPAString]
-lWordsIpa (IPAString x) = map IPAString $ T.words x
 
 
 {- type safety
@@ -61,6 +53,7 @@ data SLanguage ∷ Language → Data.Kind.Type where
   SIcelandic ∷ SLanguage 'Icelandic
   SSwedish   ∷ SLanguage 'Swedish
   SGerman    ∷ SLanguage 'German
+  SIpa       ∷ SLanguage 'Ipa
 
 instance CLanguage 'English where
   language = SEnglish
@@ -70,6 +63,8 @@ instance CLanguage 'Icelandic where
   language = SIcelandic
 instance CLanguage 'Swedish where
   language = SSwedish
+instance CLanguage 'Ipa where
+  language = SIpa
 
 
 {- functions for runtime reflection on the language underlying a value
@@ -82,6 +77,7 @@ reflectLang SEnglish   _ = English
 reflectLang SGerman    _ = German
 reflectLang SSwedish   _ = Swedish
 reflectLang SIcelandic _ = Icelandic
+reflectLang SIpa       _ = Ipa
 
 -- |take any phantom type parameterized on a Language data type
 --  and return the phantom parameter Language value

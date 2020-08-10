@@ -27,7 +27,7 @@ import Languages
 {- core types -}
 
 -- |type of a single Word-IPA correspondence in a Dict
-data DictEntry (a ∷ Language) = DictEntry (LangString a) IPAString
+data DictEntry (a ∷ Language) = DictEntry (LangString a) (LangString 'Ipa)
   deriving (Eq, Ord)
 
 -- |type containing mappings from words in a language to IPA pronounciations;
@@ -72,7 +72,7 @@ processDict (TupleDict []) = Dict []
 processDict (TupleDict (x:xs)) = dictAppend (processDict (TupleDict xs))
                                          (DictEntry
                                            (LangString $ fst x)
-                                           (IPAString $ snd x))
+                                           (LangString @'Ipa $ snd x))
 
 -- TODO: handle entries with multiple IPA definitions
 -- TODO: stop this from breaking on invalid dictionaries xd
@@ -104,11 +104,11 @@ dictLookup ∷ Dict e → LangString e → Maybe (DictEntry e)
 dictLookup (Dict vals) str = LST.find ((== str) . dictEntryLang) vals
 
 -- |find entry with equivalent ipa in dictionary
-dictLookupIPA ∷ Dict e → IPAString → Maybe (DictEntry e)
+dictLookupIPA ∷ Dict e → LangString 'Ipa → Maybe (DictEntry e)
 dictLookupIPA (Dict vals) str = LST.find ((== str) . dictEntryIPA) vals
 
 -- |extract IPA of given dictionary entry
-dictEntryIPA ∷ DictEntry e → IPAString
+dictEntryIPA ∷ DictEntry e → LangString 'Ipa
 dictEntryIPA (DictEntry _ y) = y
 
 -- |extract raw language text of given dictionary entry
@@ -116,5 +116,5 @@ dictEntryLang ∷ DictEntry e → LangString e
 dictEntryLang (DictEntry x _) = x
 
 -- empty values for external use
-nilDictEntry = DictEntry (LangString "") (IPAString "")
+nilDictEntry = DictEntry (LangString "") (LangString @'Ipa "")
 nilDict = Dict []
