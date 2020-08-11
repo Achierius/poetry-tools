@@ -6,9 +6,8 @@
 {-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE UnicodeSyntax       #-}
 
-module Languages (Language(..), SLanguage(..), CLanguage(..),
-                  LangString(..), IPAString(..), lWords,
-                  reflectLang, extractLang) where
+module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
+                  lWords, reflectLang, extractLang) where
 
 import qualified Data.Text as T
 import qualified Text.RawString.QQ as R
