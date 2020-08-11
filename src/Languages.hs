@@ -4,16 +4,18 @@
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE UnicodeSyntax       #-}
+{-# LANGUAGE UnicodeSyntax              #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
-                  lWords, reflectLang, extractLang) where
+                  lWords, lLines, lUnwords, lUnlines,
+                  reflectLang, extractLang) where
 
 import qualified Data.Text as T
 import qualified Text.RawString.QQ as R
 import qualified Text.Regex.PCRE
 import qualified Data.String as S
 import qualified Data.Kind
+
 
 {- core language types -}
 
@@ -28,15 +30,31 @@ data Language = English
 {- types for linguistic text -}
 
 newtype LangString (a∷Language) = LangString T.Text
-  deriving (Eq, Ord, S.IsString)
+  deriving (Eq, Ord, Semigroup, Monoid)
 instance Show (LangString (l ∷ Language)) where
+  -- TODO: Make this display "LangString 'English ~"
+  --       ^ will require XScopedTypeVariables
   show (LangString x) = T.unpack x
+instance Read (LangString (l ∷ Language)) where
+  readsPrec _ = \x -> [(LangString . T.pack $ x, "")]
+instance S.IsString (LangString (l ∷ Language)) where
+  fromString = LangString . T.pack
+
 
 {- helper functions for language strings -}
 
 -- |words for LangString
 lWords ∷ LangString l → [LangString l]
 lWords (LangString x) = map LangString $ T.words x
+
+lLines ∷ LangString l → [LangString l]
+lLines (LangString x) = map LangString $ T.lines x
+
+lUnwords ∷ [LangString l] → LangString l
+lUnwords lst = LangString $ T.unwords [x | LangString x ← lst]
+
+lUnlines ∷ [LangString l] → LangString l
+lUnlines lst = LangString $ T.unlines [x | LangString x ← lst]
 
 
 {- type safety
