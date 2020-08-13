@@ -52,13 +52,13 @@ newtype TupleDict (a ∷ Language) (b ∷ Language) = TupleDict [(T.Text, T.Text
 -- |internal function for embedding dictionary files with TemplateHaskell
 getRawPDict ∷ SLanguage l → BS.ByteString
 getRawPDict SEnglish   = $(Embed.embedFile
-                          "dist/resources/en/en_US_Processed.csv")
+                          "resources/ipa/en/en_US_Processed.csv")
 getRawPDict SGerman    = $(Embed.embedFile
-                          "dist/resources/de/de_Processed.csv")
+                          "resources/ipa/de/de_Processed.csv")
 getRawPDict SIcelandic = $(Embed.embedFile
-                          "dist/resources/is/is_Processed.csv")
+                          "resources/ipa/is/is_Processed.csv")
 getRawPDict SSwedish   = $(Embed.embedFile
-                          "dist/resources/sv/sv_Processed.csv")
+                          "resources/ipa/sv/sv_Processed.csv")
 
 
 {- functions for processing raw dictionaries into Dict type -}
