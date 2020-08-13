@@ -3,22 +3,18 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE UnicodeSyntax              #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
                   lWords, lLines, lUnwords, lUnlines,
                   reflectLang, extractLang) where
 
 import qualified Data.Text as T
-import qualified Text.RawString.QQ as R
-import qualified Text.Regex.PCRE
 import qualified Data.String as S
 import qualified Data.Kind
---import qualified Control.Newtype.Generics as NT
 import qualified Data.Coerce
 import qualified GHC.Generics as Gen
 
@@ -106,13 +102,3 @@ reflectLang SIpa       _ = Ipa
 --  and return the phantom parameter Language value
 extractLang ∷ CLanguage l ⇒ (a ∷ Language → ★) l → Language
 extractLang = reflectLang language
-
-
-{- regexes for splitting raw & ipa from csv dictionaries; obsolete?
- - requires -XQuasiQuotes
- -}
-
-csvIPARegex ∷ String
-csvIPARegex = [R.r|(?<=,)(.+)|]
-csvRAWRegex ∷ String
-csvRAWRegex = [R.r|^(.+)(?=,)|]
