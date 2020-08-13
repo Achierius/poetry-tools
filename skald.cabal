@@ -84,22 +84,24 @@ common dependencies
 executable skald
   import:              dependencies
   main-is:             Main.hs
-  ghc-options:         -O0
+  ghc-options:         -j4
+                       -O2
                        -threaded
-                       -Wall
 
 
-executable skald-quiet
+executable debug 
   import:              dependencies
   main-is:             Main.hs
-  ghc-options:         -O0
-                       -threaded
+  ghc-options:         -j4
+                       -O0
+                       -debug
 
 
 executable profile
   import:              dependencies
   main-is:             Main.hs
-  ghc-options:         -O2
+  ghc-options:         -j4
+                       -O2
                        -threaded
                        -fprof-auto
                        "-with-rtsopts=-N -p -s -h -i0.1"
