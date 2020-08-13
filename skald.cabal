@@ -103,5 +103,8 @@ executable profile
   ghc-options:         -j4
                        -O2
                        -threaded
-                       -fprof-auto
-                       "-with-rtsopts=-N -p -s -h -i0.1"
+                       "-with-rtsopts=-N -s -h -i0.1"
+                    -- -fprof-auto
+                    -- -external-interpreter
+                    -- -prof
+                    -- "-with-rtsopts=-N -p -s -h -i0.1"
