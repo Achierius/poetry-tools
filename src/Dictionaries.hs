@@ -90,6 +90,10 @@ getTuplePDict l = procTupleDict (getRawPDict l) l SIpa
 
 {- dictionary utility functions -}
 
+checkEq :: LangString e' -> LangString e' -> Bool
+checkEq (LangString a) (LangString b) =
+  ((T.toLower a) == (T.toLower b))
+
 -- |concatenate two same-language dictionaries into one
 dictJoin ∷ Dict l l' → Dict l l' → Dict l l'
 dictJoin (Dict x) (Dict y) = Dict (x ++ y)
@@ -103,11 +107,11 @@ dictAppend (Dict x)  y = Dict (y:x)
 --   maybe add an attribute to the Dict type to improve ord implementation?
 -- |find entry of word in dictionary
 dictLookup ∷ Dict e e' → LangString e → Maybe (DictEntry e e')
-dictLookup (Dict vals) str = LST.find ((== str) . lTerm) vals
+dictLookup (Dict vals) str = LST.find ((checkEq str) . lTerm) vals
 
 -- |find entry with equivalent right-side term in given dict
 dictRLookup ∷ Dict e e' → LangString e' → Maybe (DictEntry e e')
-dictRLookup (Dict vals) str = LST.find ((== str) . rTerm) vals
+dictRLookup (Dict vals) str = LST.find ((checkEq str) . rTerm) vals
 
 -- empty values for external use
 nilDictEntry = DictEntry (LangString "") (LangString @'Ipa "")

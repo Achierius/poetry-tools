@@ -5,6 +5,9 @@
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE UnicodeSyntax              #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
                   lWords, lLines, lUnwords, lUnlines,
@@ -15,6 +18,10 @@ import qualified Text.RawString.QQ as R
 import qualified Text.Regex.PCRE
 import qualified Data.String as S
 import qualified Data.Kind
+--import qualified Control.Newtype.Generics as NT
+import qualified Data.Coerce
+import qualified GHC.Generics as Gen
+
 
 
 {- core language types -}
@@ -29,7 +36,7 @@ data Language = English
 
 {- types for linguistic text -}
 
-newtype LangString (a∷Language) = LangString T.Text
+newtype LangString (a ∷ Language) = LangString T.Text
   deriving (Eq, Ord, Semigroup, Monoid)
 instance Show (LangString (l ∷ Language)) where
   -- TODO: Make this display "LangString 'English ~"
@@ -39,7 +46,6 @@ instance Read (LangString (l ∷ Language)) where
   readsPrec _ = \x -> [(LangString . T.pack $ x, "")]
 instance S.IsString (LangString (l ∷ Language)) where
   fromString = LangString . T.pack
-
 
 {- helper functions for language strings -}
 
