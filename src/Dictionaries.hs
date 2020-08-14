@@ -10,6 +10,7 @@
 
 module Dictionaries (DictEntry(..), Dict(..),
                      getPDict, dictJoin, dictInsert, dictLookup,
+                     cleanWord,
                      nilDict, nilDictEntry) where
 
 import           Data.Maybe
@@ -91,9 +92,16 @@ getTuplePDict ∷ SLanguage l → TupleDict l 'Ipa
 getTuplePDict l = procTupleDict (getRawPDict l) l SIpa
 
 
+punctuation = ['.', ',', '“', '„', ';', ':', '"', '\'']
+
+-- |strip punctuation from a word and turn it lowercase
+cleanWord ∷ LangString l → LangString l
+cleanWord (LangString w) =
+  LangString (T.filter (not . (flip elem punctuation)) (T.toLower w))
+
 {- dictionary utility functions -}
 
-checkEq :: LangString e' -> LangString e' -> Bool
+checkEq ∷ LangString e' → LangString e' → Bool
 checkEq (LangString a) (LangString b) =
   ((T.toLower a) == (T.toLower b))
 
@@ -103,14 +111,14 @@ dictJoin (Dict x) (Dict y) = Dict (Map.union x y)
 
 -- |append DictEntry to end of given Dict
 dictInsert ∷ DictEntry l l' → Dict l l' → Dict l l'
-dictInsert y (Dict x) = Dict (Map.insert (lTerm y) y x)
+dictInsert y (Dict x) = Dict (Map.insert (cleanWord $ lTerm y) y x)
 
 -- could we improve runtime if we guarantee dict sortedness
 --   maybe add an attribute to the Dict type to improve ord implementation?
 -- |find entry of word in dictionary
 dictLookup ∷ Dict e e' → LangString e → Maybe (DictEntry e e')
 --dictLookup (Dict vals) str = LST.find ((checkEq str) . lTerm) vals
-dictLookup (Dict x) y = Map.lookup y x
+dictLookup (Dict x) y = Map.lookup (cleanWord y) x
 
 -- |find entry with equivalent right-side term in given dict
 --dictRLookup ∷ Dict e e' → LangString e' → Maybe (DictEntry e e')

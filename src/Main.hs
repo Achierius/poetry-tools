@@ -23,25 +23,28 @@ printStrList = foldr ((>>) . putStrLn) (return ())
 dictt = getPDict SIcelandic
 translator = ipait dictt "ERROR"
 sagaloc = "resources/texts/is/Heimskringla/Yngling_Saga.txt"
-punctuation = ['.', ',', '“', '„', ';', ':', '"', '\'']
 
 toText :: LangString l -> T.Text
 toText (LangString x) = x
-
-cleanWord :: LangString l -> LangString l
-cleanWord (LangString w) =
-  LangString (T.filter (not . (flip elem punctuation)) (T.toLower w))
 
 main :: IO ()
   {- main = runProgram =<< parseCLI -} -- CANONICAL
 main = do
   saga <- readLingFile sagaloc
-  let sagaW = lWords saga
-  let cleaned = map cleanWord sagaW
-  let translation = translator $ lUnwords cleaned
-  let untranslated = [x | x <- cleaned, dictLookup dictt x == Nothing]
-  let untransText = (lUnlines . LST.nub . LST.sort $ untranslated)
+  let sagaW = map cleanWord $ lWords saga
+  let translation = translator $ lUnwords sagaW
+  let translated   = [x | x <- sagaW, isJust $ dictLookup dictt x]
+  let untranslated = [x | x <- sagaW, dictLookup dictt x == Nothing]
+  let untransList = (LST.nub . LST.sort $ untranslated)
+  let transList = (LST.nub . LST.sort $ translated)
+  let untransText = lUnwords untransList
+  let transText = lUnwords transList
+  print transText
+  print "---"
   print untransText 
+  print "---"
+  print $ "Translated: " ++ (show (length transList))
+  print $ "Untranslated: " ++ (show (length untransList))
 
 
 testFileIOMain :: IO ()
