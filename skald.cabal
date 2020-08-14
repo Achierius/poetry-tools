@@ -73,8 +73,8 @@ common dependencies
   build-depends:       base,
                        filepath, directory, mtl, options,
                        optparse-applicative,
-                       regex-pcre-builtin,
-                       raw-strings-qq,
+--                       regex-pcre-builtin,
+--                       raw-strings-qq,
                        utf8-string, bytestring, text,
                        array,
                        file-embed,
@@ -103,7 +103,7 @@ executable profile
   ghc-options:         -j4
                        -O2
                        -threaded
-                       "-with-rtsopts=-N -s -h -i0.1"
+                       "-with-rtsopts= -N -p -s -h -i0.1"
                     -- -fprof-auto
                     -- -external-interpreter
                     -- -prof

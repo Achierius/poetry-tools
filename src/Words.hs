@@ -7,7 +7,6 @@
 module Words where
 
 import           Data.String
-import           Text.RawString.QQ
 import qualified Data.Text                  as T
 import qualified Data.Text.Lazy             as TL
 import qualified Data.ByteString            as B

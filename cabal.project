@@ -1,4 +1,9 @@
-packages:                 ./*.cabal
-profiling:                True
-profiling-detail:         all-functions
-library-profiling-detail: toplevel-functions
+packages:                   ./*.cabal
+
+constraints:                Cabal >= 1.24
+
+profiling:                  True
+profiling-detail:           all-functions
+
+--executable-profiling:      True
+--library-profiling-detail: all-functions
