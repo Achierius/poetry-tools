@@ -38,7 +38,8 @@ data DictEntry (a ∷ Language) (b ∷ Language) =
 -- |type containing mappings from words in a language to IPA pronounciations;
 --  parameterized on a data-kin of type Language to prevent cross-
 --  language contamination
-newtype Dict (a ∷ Language) (b ∷ Language) = Dict [DictEntry a b]
+newtype Dict (a ∷ Language) (b ∷ Language) = Dict
+                                               [(LangString a, DictEntry a b)]
   deriving (Eq, Ord)
 
 -- |internal dictionary type, Language-annotated at the type level,
@@ -100,18 +101,19 @@ dictJoin (Dict x) (Dict y) = Dict (x ++ y)
 
 -- |append DictEntry to end of given Dict
 dictAppend ∷ Dict l l' → DictEntry l l' → Dict l l'
-dictAppend (Dict []) y = Dict [y]
-dictAppend (Dict x)  y = Dict (y:x)
+dictAppend (Dict []) y = Dict [(lTerm y, y)]
+dictAppend (Dict x)  y = Dict ((lTerm y, y):x)
 
 -- could we improve runtime if we guarantee dict sortedness
 --   maybe add an attribute to the Dict type to improve ord implementation?
 -- |find entry of word in dictionary
 dictLookup ∷ Dict e e' → LangString e → Maybe (DictEntry e e')
-dictLookup (Dict vals) str = LST.find ((checkEq str) . lTerm) vals
+--dictLookup (Dict vals) str = LST.find ((checkEq str) . lTerm) vals
+dictLookup (Dict x) y = LST.lookup y x
 
 -- |find entry with equivalent right-side term in given dict
-dictRLookup ∷ Dict e e' → LangString e' → Maybe (DictEntry e e')
-dictRLookup (Dict vals) str = LST.find ((checkEq str) . rTerm) vals
+--dictRLookup ∷ Dict e e' → LangString e' → Maybe (DictEntry e e')
+--dictRLookup (Dict vals) str = LST.find ((checkEq str) . rTerm) vals
 
 -- empty values for external use
 nilDictEntry = DictEntry (LangString "") (LangString @'Ipa "")
