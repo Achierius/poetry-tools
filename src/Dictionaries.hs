@@ -9,7 +9,7 @@
 {-# LANGUAGE UnicodeSyntax       #-}
 
 module Dictionaries (DictEntry(..), Dict(..),
-                     getPDict, dictJoin, dictAppend, dictLookup,
+                     getPDict, dictJoin, dictInsert, dictLookup,
                      nilDict, nilDictEntry) where
 
 import           Data.Maybe
@@ -20,6 +20,8 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.ByteString
 import qualified Data.FileEmbed as Embed
+import qualified Data.Map as Map
+import           Data.Map (Map)
 
 import Languages
 
@@ -38,8 +40,8 @@ data DictEntry (a ∷ Language) (b ∷ Language) =
 -- |type containing mappings from words in a language to IPA pronounciations;
 --  parameterized on a data-kin of type Language to prevent cross-
 --  language contamination
-newtype Dict (a ∷ Language) (b ∷ Language) = Dict
-                                               [(LangString a, DictEntry a b)]
+newtype Dict (a ∷ Language) (b ∷ Language) =
+          Dict (Map (LangString a) (DictEntry a b))
   deriving (Eq, Ord)
 
 -- |internal dictionary type, Language-annotated at the type level,
@@ -70,11 +72,11 @@ getPDict = processDict . getTuplePDict
 
 -- |create Dict from given TupleDict
 processDict ∷ TupleDict l l' → Dict l l'
-processDict (TupleDict []) = Dict []
-processDict (TupleDict (x:xs)) = dictAppend (processDict (TupleDict xs))
-                                            (DictEntry
-                                              (LangString $ fst x)
-                                              (LangString $ snd x))
+processDict (TupleDict [])= nilDict
+processDict (TupleDict (x:xs)) = dictInsert (DictEntry
+                                              (LangString $ fst x)    
+                                              (LangString $ snd x))   
+                                            (processDict (TupleDict xs))
 
 -- TODO: handle entries with multiple IPA definitions
 -- TODO: stop this from breaking on invalid dictionaries xd
@@ -97,19 +99,18 @@ checkEq (LangString a) (LangString b) =
 
 -- |concatenate two same-language dictionaries into one
 dictJoin ∷ Dict l l' → Dict l l' → Dict l l'
-dictJoin (Dict x) (Dict y) = Dict (x ++ y)
+dictJoin (Dict x) (Dict y) = Dict (Map.union x y)
 
 -- |append DictEntry to end of given Dict
-dictAppend ∷ Dict l l' → DictEntry l l' → Dict l l'
-dictAppend (Dict []) y = Dict [(lTerm y, y)]
-dictAppend (Dict x)  y = Dict ((lTerm y, y):x)
+dictInsert ∷ DictEntry l l' → Dict l l' → Dict l l'
+dictInsert y (Dict x) = Dict (Map.insert (lTerm y) y x)
 
 -- could we improve runtime if we guarantee dict sortedness
 --   maybe add an attribute to the Dict type to improve ord implementation?
 -- |find entry of word in dictionary
 dictLookup ∷ Dict e e' → LangString e → Maybe (DictEntry e e')
 --dictLookup (Dict vals) str = LST.find ((checkEq str) . lTerm) vals
-dictLookup (Dict x) y = LST.lookup y x
+dictLookup (Dict x) y = Map.lookup y x
 
 -- |find entry with equivalent right-side term in given dict
 --dictRLookup ∷ Dict e e' → LangString e' → Maybe (DictEntry e e')
@@ -117,4 +118,4 @@ dictLookup (Dict x) y = LST.lookup y x
 
 -- empty values for external use
 nilDictEntry = DictEntry (LangString "") (LangString @'Ipa "")
-nilDict = Dict []
+nilDict = Dict Map.empty

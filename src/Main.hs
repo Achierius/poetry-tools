@@ -22,7 +22,7 @@ printStrList = foldr ((>>) . putStrLn) (return ())
 
 dictt = getPDict SIcelandic
 translator = ipait dictt "ERROR"
-sagaloc = "resources/texts/is/Heimskringla/Yngling_Saga_Intro.txt"
+sagaloc = "resources/texts/is/Heimskringla/Yngling_Saga.txt"
 punctuation = ['.', ',', '“', '„', ';', ':', '"', '\'']
 
 toText :: LangString l -> T.Text

@@ -71,14 +71,12 @@ common dependencies
   
   -- Other library packages from which modules are imported.
   build-depends:       base,
-                       filepath, directory, mtl, options,
-                       optparse-applicative,
---                       regex-pcre-builtin,
---                       raw-strings-qq,
+                       filepath, directory, file-embed,
+                       optparse-applicative, mtl, options,
                        utf8-string, bytestring, text,
-                       array,
-                       file-embed,
+                       array, containers,
                        lens
+
   
 
 executable skald
