@@ -22,7 +22,8 @@ printStrList = foldr ((>>) . putStrLn) (return ())
 
 dictt = getPDict SIcelandic
 translator = ipait dictt "ERROR"
-sagaloc = "resources/texts/is/Heimskringla/Yngling_Saga.txt"
+--sagaloc = "resources/texts/is/Heimskringla/Yngling_Saga.txt"
+sagaloc = "resources/texts/is/Poetic_Edda/Hávamál.txt"
 
 toText :: LangString l -> T.Text
 toText (LangString x) = x
@@ -45,6 +46,7 @@ main = do
   print "---"
   print $ "Translated: " ++ (show (length transList))
   print $ "Untranslated: " ++ (show (length untransList))
+  mapM_ (T.IO.appendFile "untranslated.txt") (map ((T.cons '\n') . toText) untransList)
 
 
 testFileIOMain :: IO ()

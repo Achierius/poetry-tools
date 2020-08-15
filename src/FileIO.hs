@@ -12,6 +12,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import           Languages
 import           Dictionaries
+import           Control.Exception
 
 import           System.IO
 

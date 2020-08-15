@@ -92,7 +92,7 @@ getTuplePDict ∷ SLanguage l → TupleDict l 'Ipa
 getTuplePDict l = procTupleDict (getRawPDict l) l SIpa
 
 
-punctuation = ['.', ',', '“', '„', ';', ':', '"', '\'']
+punctuation = ['.', ',', '“', '„', ';', ':', '"', '\'', '?', '!', '}', '{', '[', ']']
 
 -- |strip punctuation from a word and turn it lowercase
 cleanWord ∷ LangString l → LangString l
@@ -113,9 +113,6 @@ dictJoin (Dict x) (Dict y) = Dict (Map.union x y)
 dictInsert ∷ DictEntry l l' → Dict l l' → Dict l l'
 dictInsert y (Dict x) = Dict (Map.insert (cleanWord $ lTerm y) y x)
 
--- could we improve runtime if we guarantee dict sortedness
---   maybe add an attribute to the Dict type to improve ord implementation?
--- |find entry of word in dictionary
 dictLookup ∷ Dict e e' → LangString e → Maybe (DictEntry e e')
 --dictLookup (Dict vals) str = LST.find ((checkEq str) . lTerm) vals
 dictLookup (Dict x) y = Map.lookup (cleanWord y) x
