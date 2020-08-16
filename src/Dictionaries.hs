@@ -63,6 +63,8 @@ getRawPDict SIcelandic = $(Embed.embedFile
                           "resources/ipa/is/is_Processed.csv")
 getRawPDict SSwedish   = $(Embed.embedFile
                           "resources/ipa/sv/sv_Processed.csv")
+getRawPDict SFinnish   = $(Embed.embedFile
+                          "resources/ipa/fi/fi_Processed.csv")
 
 
 {- functions for processing raw dictionaries into Dict type -}

@@ -26,6 +26,7 @@ data Language = English
               | Icelandic
               | Swedish
               | German
+              | Finnish
               | Ipa
               deriving (Eq, Show, Read, Enum)
 
@@ -72,16 +73,19 @@ data SLanguage ∷ Language → Data.Kind.Type where
   SIcelandic ∷ SLanguage 'Icelandic
   SSwedish   ∷ SLanguage 'Swedish
   SGerman    ∷ SLanguage 'German
+  SFinnish   ∷ SLanguage 'Finnish
   SIpa       ∷ SLanguage 'Ipa
 
 instance CLanguage 'English where
   language = SEnglish
-instance CLanguage 'German where
-  language = SGerman
 instance CLanguage 'Icelandic where
   language = SIcelandic
 instance CLanguage 'Swedish where
   language = SSwedish
+instance CLanguage 'German where
+  language = SGerman
+instance CLanguage 'Finnish where
+  language = SFinnish
 instance CLanguage 'Ipa where
   language = SIpa
 
@@ -93,9 +97,10 @@ instance CLanguage 'Ipa where
 -- |retrieve Language type at runtime from SLanguage witness
 reflectLang ∷ SLanguage l → (a ∷ Language → ★) l → Language
 reflectLang SEnglish   _ = English
-reflectLang SGerman    _ = German
 reflectLang SSwedish   _ = Swedish
 reflectLang SIcelandic _ = Icelandic
+reflectLang SGerman    _ = German
+reflectLang SFinnish   _ = Finnish
 reflectLang SIpa       _ = Ipa
 
 -- |take any phantom type parameterized on a Language data type
