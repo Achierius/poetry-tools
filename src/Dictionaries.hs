@@ -1,12 +1,18 @@
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE DeriveTraversable   #-}
-{-# LANGUAGE GADTs               #-}
-{-# LANGUAGE KindSignatures      #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell     #-}
-{-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE UnicodeSyntax       #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE UnicodeSyntax              #-}
+
+{-# LANGUAGE DeriveTraversable          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleContexts #-}
+  {-# LANGUAGE TypeFamilies #-}
 
 module Dictionaries (DictEntry(..), Dict(..),
                      getPDict, dictJoin, dictInsert, dictLookup,
@@ -23,6 +29,9 @@ import qualified Data.ByteString
 import qualified Data.FileEmbed as Embed
 import qualified Data.Map as Map
 import           Data.Map (Map)
+import qualified Control.Lens.TH as L.TH
+
+import qualified Data.MonoTraversable as Mono
 
 import Languages
 
@@ -38,12 +47,20 @@ data DictEntry (a ∷ Language) (b ∷ Language) =
          }
   deriving (Eq, Ord)
 
+
 -- |type containing mappings from words in a language to IPA pronounciations;
 --  parameterized on a data-kin of type Language to prevent cross-
 --  language contamination
 newtype Dict (a ∷ Language) (b ∷ Language) =
           Dict (Map (LangString a) (DictEntry a b))
   deriving (Eq, Ord)
+  deriving (Semigroup, Monoid)
+    via (Map (LangString a) (DictEntry a b))
+
+type instance Mono.Element (Dict a b) = DictEntry a b
+
+deriving via (Map (LangString a) (DictEntry a b)) instance
+  Mono.MonoFoldable (Dict a b)
 
 -- |internal dictionary type, Language-annotated at the type level,
 --  but with non-annotated text contents.
@@ -102,10 +119,6 @@ cleanWord (LangString w) =
   LangString (T.filter (not . (flip elem punctuation)) (T.toLower w))
 
 {- dictionary utility functions -}
-
-checkEq ∷ LangString e' → LangString e' → Bool
-checkEq (LangString a) (LangString b) =
-  ((T.toLower a) == (T.toLower b))
 
 -- |concatenate two same-language dictionaries into one
 dictJoin ∷ Dict l l' → Dict l l' → Dict l l'

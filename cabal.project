@@ -5,5 +5,7 @@ constraints:                Cabal >= 1.24
 profiling:                  True
 profiling-detail:           all-functions
 
---executable-profiling:      True
+allow-newer:                coercible-utils:base
+
+--executable-profiling:     True
 --library-profiling-detail: all-functions

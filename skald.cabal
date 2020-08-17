@@ -75,9 +75,9 @@ common dependencies
                        optparse-applicative, mtl, options,
                        utf8-string, bytestring, text,
                        array, containers,
-                       lens
+                       mono-traversable,
+                       lens, newtype ^>= 0.2.2.0, coercible-utils
 
-  
 
 executable skald
   import:              dependencies

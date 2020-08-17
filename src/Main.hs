@@ -11,6 +11,8 @@ import qualified Data.Text.IO               as T.IO
 import qualified Data.Text.Encoding         as T.Encoding
 import qualified Data.List                  as LST
 
+import qualified Data.MonoTraversable       as Mono
+
 import           UserIO
 import           Words
 import           Languages
@@ -35,7 +37,8 @@ main :: IO ()
 main = do
   saga <- readLingFile sagaloc
   let sagaW = map cleanWord $ lWords saga
-  let translation = translator $ lUnwords sagaW
+  --let viable = [x | x <- sagaW, Mono.oelem x dictt]
+  let translation = translator $ lUnlines sagaW
   let translated   = [x | x <- sagaW, isJust $ dictLookup dictt x]
   let untranslated = [x | x <- sagaW, dictLookup dictt x == Nothing]
   let untransList = (LST.nub . LST.sort $ untranslated)
@@ -48,6 +51,7 @@ main = do
   print "---"
   print $ "Translated: " ++ (show (length transList))
   print $ "Untranslated: " ++ (show (length untransList))
+  T.IO.writeFile "translated.txt" (toText $ lUnlines (translator $ lUnlines translated))
   --mapM_ (T.IO.appendFile "untranslated.txt") (map ((T.cons '\n') . toText) untransList)
 
 

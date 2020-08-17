@@ -4,9 +4,15 @@
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE UnicodeSyntax              #-}
-{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
+
+  {-# LANGUAGE TemplateHaskell #-}
+    {-# LANGUAGE TypeFamilies #-}
+      {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DeriveGeneric              #-}
+
+  {-# LANGUAGE FlexibleContexts #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
                   lWords, lLines, lUnwords, lUnlines,
@@ -18,7 +24,11 @@ import qualified Data.Kind
 import qualified Data.Coerce
 import qualified GHC.Generics as Gen
 
+import           Control.Lens.Iso (iso)
+import qualified Control.Lens.TH as L.TH
+import qualified Control.Lens.Wrapped as L.W
 
+import qualified Control.Newtype as NT
 
 {- core language types -}
 
@@ -34,7 +44,7 @@ data Language = English
 {- types for linguistic text -}
 
 newtype LangString (a ∷ Language) = LangString T.Text
-  deriving (Eq, Ord, Semigroup, Monoid)
+  deriving (Eq, Ord, Semigroup, Monoid, Gen.Generic)
 instance Show (LangString (l ∷ Language)) where
   -- TODO: Make this display "LangString 'English ~"
   --       ^ will require XScopedTypeVariables
@@ -43,6 +53,12 @@ instance Read (LangString (l ∷ Language)) where
   readsPrec _ = \x -> [(LangString . T.pack $ x, "")]
 instance S.IsString (LangString (l ∷ Language)) where
   fromString = LangString . T.pack
+instance L.W.Wrapped (LangString (l ∷ Language))
+--  type Unwrapped (LangString l) = T.Text
+--  _Wrapped' = iso (\(LangString x) -> x) LangString
+instance NT.Newtype (LangString (l ∷ Language)) T.Text
+
+$(L.TH.makeLenses ''LangString)
 
 {- helper functions for language strings -}
 
