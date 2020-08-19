@@ -39,8 +39,8 @@ main = do
   let sagaW = map cleanWord $ lWords saga
   --let viable = [x | x <- sagaW, Mono.oelem x dictt]
   let translation = translator $ lUnlines sagaW
-  let translated   = [x | x <- sagaW, isJust $ dictLookup dictt x]
-  let untranslated = [x | x <- sagaW, dictLookup dictt x == Nothing]
+  let translated   = [x | x <- sagaW, isJust $ dictLookup x dictt]
+  let untranslated = [x | x <- sagaW, dictLookup x dictt == Nothing]
   let untransList = (LST.nub . LST.sort $ untranslated)
   let transList = (LST.nub . LST.sort $ translated)
   let untransText = lUnwords untransList

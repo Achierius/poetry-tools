@@ -27,10 +27,10 @@ runProgram :: Options -> IO ()
 runProgram o = do
     let word = T.pack $ oWord o
     let dict = getPDict SEnglish
-    let entry = dictLookup dict (LangString @'English word)
+    let entry = dictLookup (LangString @'English word) dict
     let output = case entry of
             Just x  -> "IPA for " <> word <> ": " <>
-                       "  /" <> (T.pack . show $ rTerm x) <> "/"
+                       "  /" <> (T.pack . show $ x) <> "/"
             Nothing -> "Failed to lookup word " <>
                        "\"" <> word <> "\""
     Data.Text.IO.putStrLn output
