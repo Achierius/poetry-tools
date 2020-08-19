@@ -66,6 +66,7 @@ common dependencies
                        Languages
                        Dictionaries
                        FileIO
+                       Poetics
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    
   

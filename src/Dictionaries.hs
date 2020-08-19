@@ -12,7 +12,7 @@
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE FlexibleContexts #-}
-  {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Dictionaries (Dict(..), dMap,
                      getPDict, dictJoin, dictInsert, dictLookup,
@@ -125,8 +125,11 @@ punctuation = ['.', ',', '“', '„', ';', ':', '"', '\'', '?', '!', '}', '{', 
 
 -- |strip punctuation from a word and turn it lowercase
 cleanWord ∷ LangString l → LangString l
-cleanWord (LangString w) =
-  LangString (T.filter (not . (flip elem punctuation)) (T.toLower w))
+cleanWord (LangString w) = LangString (cleanText w)
+
+cleanText ∷ T.Text → T.Text
+cleanText w = T.filter (not . (flip elem punctuation)) (T.toLower w)
+
 
 {- dictionary utility functions -}
 
