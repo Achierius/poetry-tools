@@ -47,7 +47,7 @@ instance Allit Icelandic where
   (!@~) x y = not $ allitIcelandic x y
 
 vowelIcelandic ∷ Char → Bool
-vowelIcelandic c = elem c ['œ', 'ɔ', 'ɛ', 'u', 'o', 'i', 'e', 'a', 'ɪ',  'ɣ', 'ʏ']
+vowelIcelandic c = c `elem` ['œ', 'ɔ', 'ɛ', 'u', 'o', 'i', 'e', 'a', 'ɪ',  'ɣ', 'ʏ']
 
 allitIcelandic ∷ (l ~ l') ⇒ LangString l → LangString l' → Bool
 allitIcelandic (LangString x) (LangString x')

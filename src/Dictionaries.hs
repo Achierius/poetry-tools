@@ -10,9 +10,9 @@
 {-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DerivingVia                #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE TypeFamilies               #-}
 
 module Dictionaries (Dict(..), dMap,
                      getPDict, dictJoin, dictInsert, dictLookup,
@@ -34,7 +34,7 @@ import qualified Control.Lens as L
 import qualified Control.Lens.TH as L.TH
 import qualified Data.MonoTraversable as Mono
 
-import Languages
+import           Languages
 
 
 {- core types -}
@@ -128,7 +128,7 @@ cleanWord ∷ LangString l → LangString l
 cleanWord (LangString w) = LangString (cleanText w)
 
 cleanText ∷ T.Text → T.Text
-cleanText w = T.filter (not . (flip elem punctuation)) (T.toLower w)
+cleanText w = T.filter (not . (`elem` punctuation)) (T.toLower w)
 
 
 {- dictionary utility functions -}

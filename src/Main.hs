@@ -57,7 +57,7 @@ main = do
   --let viable = [x | x <- sagaW, Mono.oelem x dictt]
   let translation = translator $ lUnlines sagaW
   let translated   = [x | x <- sagaW, isJust $ dictLookup x dictt]
-  let untranslated = [x | x <- sagaW, dictLookup x dictt == Nothing]
+  let untranslated = [x | x <- sagaW, isNothing $ dictLookup x dictt]
   let untransList = (LST.nub . LST.sort $ untranslated)
   let transList = (LST.nub . LST.sort $ translated)
   let untransText = lUnwords untransList

@@ -31,9 +31,9 @@ data Line (l :: Language) = Line { firstLine  :: [LangString l]
                                  , secondLine :: [LangString l]
                                  } deriving (Eq)
 instance Show (Line (l :: Language)) where
-    show (Line x y) = (unwords (map show x))
+    show (Line x y) = unwords (map show x)
                    ++ halfLineSeparator
-                   ++ (unwords (map show y))
+                   ++ unwords (map show y)
 
 
 -- TODO: Redo printing alignment stuff
@@ -71,7 +71,7 @@ exL3 = Line exHL5 exHL6
 exSZ1 = Stanza [exL1, exL2]
 exSZ2 = Stanza []
 exSZ3 = Stanza [exL3]
-exPoem = Poem @'English [exSZ1, exSZ2, exSZ3] (RuleNothing)
+exPoem = Poem @'English [exSZ1, exSZ2, exSZ3] RuleNothing
 
 exHL1_G = map (LangString @'German) (T.words "nice")
 

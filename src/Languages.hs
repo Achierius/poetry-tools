@@ -7,12 +7,11 @@
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 
-  {-# LANGUAGE TemplateHaskell #-}
-    {-# LANGUAGE TypeFamilies #-}
-      {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE DeriveGeneric              #-}
-
-  {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts           #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
                   lWords, lLines, lUnwords, lUnlines,

@@ -24,4 +24,4 @@ readLingFile p = do
                  return result
 
 ipait ∷ Dict l 'Ipa → LangString 'Ipa → LangString l → [LangString 'Ipa]
-ipait d f t = map (fromMaybe f . (\x -> dictLookup x d)) $ lWords t
+ipait d f t = map (fromMaybe f . (`dictLookup` d)) $ lWords t
