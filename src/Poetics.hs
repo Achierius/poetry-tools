@@ -8,6 +8,11 @@
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 
+  {-# LANGUAGE TypeFamilies #-}
+  {-# LANGUAGE PolyKinds   #-}
+    {-# LANGUAGE TypeOperators #-}  
+    {-# LANGUAGE InstanceSigs #-}  
+
 --{-# LANGUAGE TemplateHaskell            #-}
 --{-# LANGUAGE TypeFamilies               #-}
 --{-# LANGUAGE DeriveGeneric              #-}
@@ -19,19 +24,20 @@
 module Poetics where
 
 import           Data.Maybe
-import qualified Data.List              as LST
-import qualified Data.Text              as T
-import qualified Data.Text.Encoding     as TE
-import qualified Data.ByteString        as BStr
-
+import qualified Data.List               as LST
+import qualified Data.Text               as T
+import qualified Data.Text.Encoding      as TE
+import qualified Data.ByteString         as BStr
 import           Data.String (IsString)
+
+import           GHC.TypeLits (Nat)
 --import qualified Data.Bifunctor      as BF
 --import qualified Data.Map as Map
 --import           Data.Map (Map)
 
 import           Languages
-import           Words
 
+import Data.Proxy
 -- TODO: Make this a descendant typeclass of IsString, might need fancy kind
 --       extensions of some sort
 -- class IsString (s l) ⇒ Allit (s ∷ Language → *) (l ∷ Language) where
@@ -56,3 +62,36 @@ allitIcelandic (LangString x) (LangString x')
     where
       c = T.head x
       c' = T.head x'
+
+data Stanza (c1 :: Nat) (c2 :: Nat) (c3 :: Nat) (c4 :: Nat) (c5 :: Nat)
+  = Stanza { line1 :: Line c1
+           , line2 :: Line c2
+           , line3 :: Line c3
+           , line4 :: Line c4
+           , line5 :: Line c5
+           }
+
+data Line (c :: Nat) = Line (HalfLine c) (HalfLine c)
+
+data HalfLine (c :: Nat) where
+  HalfLineA :: { clusterA :: [Fall]
+               , clusterB :: [Fall]
+               , clusterC :: [Fall]
+               , staveA   :: Lift c
+               , staveBx  :: Lift c'
+               } -> HalfLine c
+  HalfLineB :: { clusterA :: [Fall]
+               , clusterB :: [Fall]
+               , clusterC :: [Fall]
+               , staveAx  :: Lift c'
+               , staveB   :: Lift c
+               } -> HalfLine c
+  HalfLineC :: { clusterA :: [Fall]
+               , clusterB :: [Fall]
+               , clusterC :: [Fall]
+               , staveA   :: Lift c
+               , staveB   :: Lift c
+               } -> HalfLine c
+
+data Lift (c :: Nat) = Lift (Proxy c) String
+data Fall = Fall String
