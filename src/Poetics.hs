@@ -36,6 +36,7 @@ import           GHC.TypeLits (Nat)
 --import           Data.Map (Map)
 
 import           Languages
+import           TypeInequality
 
 import Data.Proxy
 -- TODO: Make this a descendant typeclass of IsString, might need fancy kind
@@ -72,15 +73,15 @@ data Stanza (c1 :: Nat) (c2 :: Nat) (c3 :: Nat) (c4 :: Nat) (c5 :: Nat)
            }
 
 data Line (c :: Nat) where
-    LineA :: { hlA :: HalfLine c y
-             , hlS :: HalfLine c x
-             } -> Line c
-    LineB :: { hlB :: HalfLine y c
-             , hlS :: HalfLine c x
-             } -> Line c
-    LineC :: { hlC :: HalfLine c c
-             , hlS :: HalfLine c x
-             } -> Line c
+    LineA :: (c !~ x, c !~ y) => { hlA :: HalfLine c y
+                                 , hlS :: HalfLine c x
+                                 } -> Line c
+    LineB :: (c !~ x, c !~ y) => { hlB :: HalfLine y c
+                                 , hlS :: HalfLine c x
+                                 } -> Line c
+    LineC :: (c !~ x)         => { hlC :: HalfLine c c
+                                 , hlS :: HalfLine c x
+                                 } -> Line c
 
 data HalfLine (a :: Nat) (b :: Nat)
   = HalfLine { clusterA :: [Fall]
