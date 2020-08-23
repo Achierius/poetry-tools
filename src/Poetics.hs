@@ -71,27 +71,24 @@ data Stanza (c1 :: Nat) (c2 :: Nat) (c3 :: Nat) (c4 :: Nat) (c5 :: Nat)
            , line5 :: Line c5
            }
 
-data Line (c :: Nat) = Line (HalfLine c) (HalfLine c)
+data Line (c :: Nat) where
+    LineA :: { hlA :: HalfLine c y
+             , hlS :: HalfLine c x
+             } -> Line c
+    LineB :: { hlB :: HalfLine y c
+             , hlS :: HalfLine c x
+             } -> Line c
+    LineC :: { hlC :: HalfLine c c
+             , hlS :: HalfLine c x
+             } -> Line c
 
-data HalfLine (c :: Nat) where
-  HalfLineA :: { clusterA :: [Fall]
-               , clusterB :: [Fall]
-               , clusterC :: [Fall]
-               , staveA   :: Lift c
-               , staveBx  :: Lift c'
-               } -> HalfLine c
-  HalfLineB :: { clusterA :: [Fall]
-               , clusterB :: [Fall]
-               , clusterC :: [Fall]
-               , staveAx  :: Lift c'
-               , staveB   :: Lift c
-               } -> HalfLine c
-  HalfLineC :: { clusterA :: [Fall]
-               , clusterB :: [Fall]
-               , clusterC :: [Fall]
-               , staveA   :: Lift c
-               , staveB   :: Lift c
-               } -> HalfLine c
+data HalfLine (a :: Nat) (b :: Nat)
+  = HalfLine { clusterA :: [Fall]
+             , clusterB :: [Fall]
+             , clusterC :: [Fall]
+             , staveA   :: Lift a
+             , staveBx  :: Lift b
+             }
 
 data Lift (c :: Nat) = Lift (Proxy c) String
 data Fall = Fall String
