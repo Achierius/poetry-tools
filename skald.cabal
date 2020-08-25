@@ -78,7 +78,11 @@ common dependencies
                        utf8-string, bytestring, text,
                        array, containers,
                        mono-traversable,
-                       lens, newtype ^>= 0.2.2.0, coercible-utils
+                       lens, newtype ^>= 0.2.2.0, coercible-utils,
+                       ghc-typelits-natnormalise,
+                       vector-sized
+                       --ghc-prim
+                       --ghc-typelits-knownnat <= 0.7.3
 
 
 executable skald
@@ -95,6 +99,7 @@ executable debug
   ghc-options:         -j4
                        -O0
                        -debug
+                       "-with-rtsopts= -generate-crash-dumps"
 
 
 executable profile

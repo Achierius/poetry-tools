@@ -1,4 +1,3 @@
-{-# LANGUAGE UnicodeSyntax              #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE OverloadedStrings          #-}
@@ -13,6 +12,11 @@
     {-# LANGUAGE TypeOperators #-}  
     {-# LANGUAGE InstanceSigs #-}  
 
+
+  {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
+  --  {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
+
+{-# LANGUAGE UnicodeSyntax              #-}
 --{-# LANGUAGE TemplateHaskell            #-}
 --{-# LANGUAGE TypeFamilies               #-}
 --{-# LANGUAGE DeriveGeneric              #-}
@@ -30,7 +34,9 @@ import qualified Data.Text.Encoding      as TE
 import qualified Data.ByteString         as BStr
 import           Data.String (IsString)
 
-import           GHC.TypeLits (Nat)
+--import           GHC.Types
+import           GHC.TypeLits (Nat, KnownNat, CmpNat, type (<=), type (-), type (+))
+import           Data.Vector.Sized hiding (elem)
 --import qualified Data.Bifunctor      as BF
 --import qualified Data.Map as Map
 --import           Data.Map (Map)
@@ -83,13 +89,31 @@ data Line (c :: Nat) where
                                  , hlS :: HalfLine c x
                                  } -> Line c
 
-data HalfLine (a :: Nat) (b :: Nat)
-  = HalfLine { clusterA :: [Fall]
-             , clusterB :: [Fall]
-             , clusterC :: [Fall]
-             , staveA   :: Lift a
-             , staveBx  :: Lift b
-             }
+data HalfLine (a :: Nat) (b :: Nat) where
+    HalfLine :: ((<=)   (n1 + n2 + n3) 6,
+                 CmpNat (n1 + n2     ) 0 ~ 'GT,
+                 CmpNat (     n2 + n3) 0 ~ 'GT,
+                 CmpNat (n1      + n3) 0 ~ 'GT) =>
+                  { clusterA :: Vector n1 Fall
+                  , clusterB :: Vector n2 Fall
+                  , clusterC :: Vector n3 Fall
+                  , staveA   :: Lift a
+                  , staveBx  :: Lift b
+                  } -> HalfLine a b
 
-data Lift (c :: Nat) = Lift (Proxy c) String
-data Fall = Fall String
+
+data (KnownNat c) => Lift c = Lift (LangString 'Ipa)
+data Fall = Fall (LangString 'Ipa)
+
+
+-- TODO I FEEL LIKE THIS COULD BE BETTER WITH ARROWS...
+-- _mkHalfLine :: Maybe (Vector n1 Fall) ->
+--                Maybe (Vector n2 Fall) ->
+--                Maybe (Vector n3 Fall) ->
+--                Lift a -> Lift b ->
+--                Maybe (HalfLine a b)
+-- _mkHalfLine (Just f1) (Just f2) (Just f3) l1 l2 = Just $ HalfLine f1 f2 f3 l1 l2
+-- _mkHalfLine _ _ _ _ _ = Nothing
+-- 
+-- mkHalfLine :: [Fall] -> [Fall] -> [Fall] -> Lift a -> Lift b -> Maybe (HalfLine a b)
+-- mkHalfLine f1 f2 f3 = _mkHalfLine (fromList f1) (fromList f2) (fromList f3)
