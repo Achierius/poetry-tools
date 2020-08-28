@@ -1,0 +1,11 @@
+packages:                   ./*.cabal
+
+constraints:                Cabal >= 1.24
+
+profiling:                  True
+profiling-detail:           all-functions
+
+allow-newer:                coercible-utils:base
+
+--executable-profiling:     True
+--library-profiling-detail: all-functions
