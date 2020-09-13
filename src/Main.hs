@@ -1,27 +1,30 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeApplications  #-}
 
-{-# LANGUAGE TemplateHaskell  #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module Main where
 
 
+import qualified Data.ByteString      as BS
+import qualified Data.FileEmbed       as Embed
+import qualified Data.List            as LST
+import qualified Data.List            as LST
 import           Data.Maybe
-import qualified Data.Text                  as T
-import qualified Data.Text.IO               as T.IO
-import qualified Data.Text.Encoding         as T.Encoding
-import qualified Data.ByteString            as BS
-import qualified Data.List                  as LST
-import qualified Data.FileEmbed             as Embed
+import qualified Data.MonoTraversable as Mono
+import qualified Data.Text            as T
+import qualified Data.Text.Encoding   as T.Encoding
+import qualified Data.Text.IO         as T.IO
 
-import qualified Data.MonoTraversable       as Mono
-
-import           Languages
 import           Dictionaries
-import           Words
+import           FileIO
+import           Languages
+import           Languages
 import           Poetics
 import           UserIO
-import           FileIO
+import           UserIO
+import           Words
+import           Words
 
 printStrList :: [String] -> IO ()
 printStrList = foldr ((>>) . putStrLn) (return ())
@@ -35,7 +38,7 @@ sagaloc = "resources/texts/is/Heimskringla/Yngling_Saga.txt"
 --sagaloc = "resources/texts/fi/Kalevala/Kalevala.txt"
 
 testAmal = $(Embed.embedFile "resources/texts/is/Poetic_Edda/Hávamál_Stanza_1.txt")
-                          
+
 
 toText :: LangString l -> T.Text
 toText (LangString x) = x
@@ -44,7 +47,7 @@ toText (LangString x) = x
 getAllits :: BS.ByteString -> LangString 'Icelandic -> [LangString 'Icelandic]
 getAllits bytes word = [words | words <- decoded, allitIcelandic words word]
                          where
-                           decoded = map 
+                           decoded = map
                                        (cleanWord . LangString)
                                        (T.words (T.Encoding.decodeUtf8 bytes))
 
@@ -64,7 +67,7 @@ main = do
   let transText = lUnwords transList
 --  print transText
 --  print "---"
---  print untransText 
+--  print untransText
 --  print "---"
 --  print $ "Translated: " ++ (show (length transList))
 --  print $ "Untranslated: " ++ (show (length untransList))
@@ -78,7 +81,7 @@ main = do
 ----  let LangString saga = sagaLang
 ----  let lowersaga = T.words $ T.toLower saga
 ----  let freesaga = map (T.dropWhileEnd (`elem` ['.', ',']))
-----                     lowersaga 
+----                     lowersaga
 ----  let langsaga = map (LangString @'Icelandic) freesaga
 ----  let help = translator $ lUnwords langsaga
 ----  print langsaga

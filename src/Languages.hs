@@ -1,33 +1,30 @@
 {-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE UnicodeSyntax              #-}
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
-
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE UnicodeSyntax              #-}
 
 module Languages (Language(..), SLanguage(..), CLanguage(..), LangString(..),
                   lWords, lLines, lUnwords, lUnlines,
                   reflectLang, extractLang) where
 
-import qualified Data.Text as T
-import qualified Data.String as S
-import qualified Data.Kind
-import qualified Data.Coerce
-import qualified GHC.Generics as Gen
-
-import           Control.Lens.Iso (iso)
-import qualified Control.Lens.TH as L.TH
+import           Control.Lens.Iso     (iso)
+import qualified Control.Lens.TH      as L.TH
 import qualified Control.Lens.Wrapped as L.W
-
-import qualified Control.Newtype as NT
+import qualified Control.Newtype      as NT
+import qualified Data.Coerce
+import qualified Data.Kind
+import qualified Data.String          as S
+import qualified Data.Text            as T
+import qualified GHC.Generics         as Gen
 
 {- core language types -}
 

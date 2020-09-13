@@ -1,27 +1,30 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE DataKinds         #-}
 
 module UserIO where
 
 -- Temporarily using code from the following tutorial:
 -- https://thoughtbot.com/blog/refactoring-to-a-monad-transformer-stack
 
-import           Data.Maybe
-import           Options.Applicative
-import qualified Data.Bifunctor as Bifunctor
-import qualified Control.Exception as Exception
+import qualified Control.Exception         as Exception
+import qualified Data.Bifunctor            as Bifunctor
 import qualified Data.ByteString.Lazy.UTF8 as BLU
-import qualified Data.Text as T
+import           Data.Maybe
+import qualified Data.Text                 as T
 import qualified Data.Text.IO
+import           Options.Applicative
 
-import           Languages
 import           Dictionaries
+import           Languages
 
 {- main body of program -}
 
-data Options = Options
-    { oWord :: String, oTarget :: Maybe String }
+data Options
+  = Options
+      { oWord   :: String
+      , oTarget :: Maybe String
+      }
 
 runProgram :: Options -> IO ()
 runProgram o = do
@@ -38,13 +41,13 @@ runProgram o = do
 
 {- tutorial code for handling CLI and file IO -}
 
--- CLI parsing 
+-- CLI parsing
 parseCLI :: IO Options
 parseCLI = execParser (withInfo parseOptions "File Fun")
   where
     withInfo opts h = info (helper <*> opts) $ header h
 
--- CLI options handling 
+-- CLI options handling
 parseOptions :: Parser Options
 parseOptions = Options
     <$> (strOption $ long "word")

@@ -1,38 +1,39 @@
 {-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveTraversable          #-}
+{-# LANGUAGE DerivingVia                #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeApplications           #-}
-{-# LANGUAGE UnicodeSyntax              #-}
-
-{-# LANGUAGE DeriveTraversable          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE DerivingVia                #-}
-{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE UnicodeSyntax              #-}
 
 module Dictionaries (Dict(..), dMap,
                      getPDict, dictJoin, dictInsert, dictLookup,
                      cleanWord,
                      nilDict) where
 
-import           Data.Maybe
-import qualified Data.ByteString as BS
-import qualified Data.List as LST
-import qualified Data.Bifunctor as BF
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
+import qualified Control.Lens         as L
+import qualified Control.Lens.TH      as L.TH
+import qualified Control.Lens.TH      as L.TH
+import qualified Data.Bifunctor       as BF
+import qualified Data.ByteString      as BS
 import qualified Data.ByteString
-import qualified Data.FileEmbed as Embed
-import qualified Data.Map as Map
-import           Data.Map (Map)
-
-import qualified Control.Lens as L
-import qualified Control.Lens.TH as L.TH
+import qualified Data.FileEmbed       as Embed
+import qualified Data.List            as LST
+import           Data.Map             (Map)
+import           Data.Map             (Map)
+import qualified Data.Map             as Map
+import qualified Data.Map             as Map
+import           Data.Maybe
 import qualified Data.MonoTraversable as Mono
+import qualified Data.Text            as T
+import qualified Data.Text.Encoding   as TE
 
 import           Languages
 
@@ -40,23 +41,21 @@ import           Languages
 {- core types -}
 
 -- |type of a single Word-IPA correspondence in a Dict
---data DictEntry (a ∷ Language) (b ∷ Language) = 
---       DictEntry 
+--data DictEntry (a ∷ Language) (b ∷ Language) =
+--       DictEntry
 --         {
 --           lTerm ∷ LangString a
---         , rTerm ∷ LangString b 
+--         , rTerm ∷ LangString b
 --         }
 --  deriving (Eq, Ord)
-
 
 -- |type containing mappings from words in a language to IPA pronounciations;
 --  parameterized on a data-kin of type Language to prevent cross-
 --  language contamination
-data Dict (a ∷ Language) (b ∷ Language) =
-        Dict
-          {
-            _dMap ∷ Map (LangString a) (LangString b)
-          }
+data Dict (a :: Language) (b :: Language)
+  = Dict
+      { _dMap :: Map (LangString a) (LangString b)
+      }
   deriving (Eq, Ord)
   --deriving (Semigroup, Monoid)
   --  via (Map (LangString a) (LangString b))
@@ -103,7 +102,7 @@ getPDict = processDict . getTuplePDict
 -- |create Dict from given TupleDict
 processDict ∷ TupleDict l l' → Dict l l'
 processDict (TupleDict [])= nilDict
-processDict (TupleDict (x:xs)) = dictInsert 
+processDict (TupleDict (x:xs)) = dictInsert
                                    (LangString $ fst x)
                                    (LangString $ snd x)
                                    (processDict $ TupleDict xs)
@@ -112,7 +111,7 @@ processDict (TupleDict (x:xs)) = dictInsert
 -- TODO: stop this from breaking on invalid dictionaries xd
 -- |convert RawDict to TupleDict
 procTupleDict ∷ BS.ByteString → SLanguage l → SLanguage l' → TupleDict l l'
-procTupleDict bytes _ _ = 
+procTupleDict bytes _ _ =
   TupleDict $ map
     (BF.second (T.drop 1) . head . T.breakOnAll ",")
     (T.lines (TE.decodeUtf8 bytes))
