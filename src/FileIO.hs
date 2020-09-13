@@ -24,8 +24,5 @@ readLingFile p = do
                  let result = LangString $ T.pack instr
                  return result
 
-translateWord ∷ Dict l l' → LangString l → Maybe (LangString l')
-translateWord d s = fmap rTerm $ dictLookup d s
-
 ipait ∷ Dict l 'Ipa → LangString 'Ipa → LangString l → [LangString 'Ipa]
-ipait d f t = map (fromMaybe f . translateWord d) $ lWords t
+ipait d f t = map (fromMaybe f . (`dictLookup` d)) $ lWords t
