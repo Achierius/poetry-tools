@@ -1,23 +1,22 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module Main where
 
 
+import qualified Data.List            as LST
 import           Data.Maybe
-import qualified Data.Text                  as T
-import qualified Data.Text.IO               as T.IO
-import qualified Data.Text.Encoding         as T.Encoding
-import qualified Data.List                  as LST
+import qualified Data.MonoTraversable as Mono
+import qualified Data.Text            as T
+import qualified Data.Text.Encoding   as T.Encoding
+import qualified Data.Text.IO         as T.IO
 
-import qualified Data.MonoTraversable       as Mono
-
-import           UserIO
-import           Words
-import           Languages
 import           Dictionaries
 import           FileIO
+import           Languages
+import           UserIO
+import           Words
 
 printStrList :: [String] -> IO ()
 printStrList = foldr ((>>) . putStrLn) (return ())
@@ -47,7 +46,7 @@ main = do
   let transText = lUnwords transList
   print transText
   print "---"
-  print untransText 
+  print untransText
   print "---"
   print $ "Translated: " ++ (show (length transList))
   print $ "Untranslated: " ++ (show (length untransList))
@@ -61,7 +60,7 @@ main = do
 ----  let LangString saga = sagaLang
 ----  let lowersaga = T.words $ T.toLower saga
 ----  let freesaga = map (T.dropWhileEnd (`elem` ['.', ',']))
-----                     lowersaga 
+----                     lowersaga
 ----  let langsaga = map (LangString @'Icelandic) freesaga
 ----  let help = translator $ lUnwords langsaga
 ----  print langsaga

@@ -1,17 +1,17 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE GADTs                      #-}
-{-# LANGUAGE KindSignatures             #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE KindSignatures    #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module Words where
 
+import qualified Data.ByteString           as B
+import qualified Data.ByteString.Lazy      as BL
+import qualified Data.ByteString.Lazy.UTF8 as BLU
 import           Data.String
-import qualified Data.Text                  as T
-import qualified Data.Text.Lazy             as TL
-import qualified Data.ByteString            as B
-import qualified Data.ByteString.Lazy       as BL
-import qualified Data.ByteString.Lazy.UTF8  as BLU
+import qualified Data.Text                 as T
+import qualified Data.Text.Lazy            as TL
 
 import           Languages
 
@@ -27,9 +27,12 @@ data Rule = RuleNothing deriving (Eq)
 
 type HalfLine (l :: Language) = [LangString l]
 
-data Line (l :: Language) = Line { firstLine  :: [LangString l]
-                                 , secondLine :: [LangString l]
-                                 } deriving (Eq)
+data Line (l :: Language)
+  = Line
+      { firstLine  :: [LangString l]
+      , secondLine :: [LangString l]
+      }
+  deriving (Eq)
 instance Show (Line (l :: Language)) where
     show (Line x y) = (unwords (map show x))
                    ++ halfLineSeparator
@@ -46,9 +49,12 @@ instance Show (Stanza (l :: Language)) where
                           ++ show (Stanza xs)
                           -- TODO: I feel like this is inefficient
 
-data Poem (l :: Language) = Poem { stanzas :: [Stanza l]
-                                 , ruleset :: Rule
-                                 } deriving (Eq)
+data Poem (l :: Language)
+  = Poem
+      { stanzas :: [Stanza l]
+      , ruleset :: Rule
+      }
+  deriving (Eq)
 instance Show (Poem (l :: Language)) where
     show (Poem [] _ ) = ""
     show (Poem [x] _ ) = show x
