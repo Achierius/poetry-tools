@@ -1,8 +1,8 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds       #-}
+{-# LANGUAGE PolyKinds       #-}
 {-# LANGUAGE TypeFamilies    #-}
 {-# LANGUAGE TypeOperators   #-}
-{-# LANGUAGE PolyKinds       #-}
 
 module TypeInequality ( type (!~) ) where
 

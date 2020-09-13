@@ -1,22 +1,21 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE TypeApplications           #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE LambdaCase                 #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE KindSignatures             #-}
-{-# LANGUAGE GADTs                      #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE InstanceSigs          #-}
+{-# LANGUAGE KindSignatures        #-}
+{-# LANGUAGE LambdaCase            #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
 
-  {-# LANGUAGE TypeFamilies #-}
-  {-# LANGUAGE PolyKinds   #-}
-    {-# LANGUAGE TypeOperators #-}  
-    {-# LANGUAGE InstanceSigs #-}  
 
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
+--{-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
-  {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
-  --  {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
-
-{-# LANGUAGE UnicodeSyntax              #-}
+{-# LANGUAGE UnicodeSyntax         #-}
 --{-# LANGUAGE TemplateHaskell            #-}
 --{-# LANGUAGE TypeFamilies               #-}
 --{-# LANGUAGE DeriveGeneric              #-}
@@ -27,16 +26,17 @@
 
 module Poetics where
 
+import qualified Data.ByteString    as BStr
+import qualified Data.List          as LST
 import           Data.Maybe
-import qualified Data.List               as LST
-import qualified Data.Text               as T
-import qualified Data.Text.Encoding      as TE
-import qualified Data.ByteString         as BStr
-import           Data.String (IsString)
+import           Data.String        (IsString)
+import qualified Data.Text          as T
+import qualified Data.Text.Encoding as TE
 
 --import           GHC.Types
-import           GHC.TypeLits (Nat, KnownNat, CmpNat, type (<=), type (-), type (+))
-import           Data.Vector.Sized hiding (elem)
+import           Data.Vector.Sized  hiding (elem)
+import           GHC.TypeLits       (type (+), type (-), type (<=), CmpNat,
+                                     KnownNat, Nat)
 --import qualified Data.Bifunctor      as BF
 --import qualified Data.Map as Map
 --import           Data.Map (Map)
@@ -44,7 +44,7 @@ import           Data.Vector.Sized hiding (elem)
 import           Languages
 import           TypeInequality
 
-import Data.Proxy
+import           Data.Proxy
 -- TODO: Make this a descendant typeclass of IsString, might need fancy kind
 --       extensions of some sort
 -- class IsString (s l) ⇒ Allit (s ∷ Language → *) (l ∷ Language) where
@@ -71,12 +71,13 @@ allitIcelandic (LangString x) (LangString x')
       c' = T.head x'
 
 data Stanza (c1 :: Nat) (c2 :: Nat) (c3 :: Nat) (c4 :: Nat) (c5 :: Nat)
-  = Stanza { line1 :: Line c1
-           , line2 :: Line c2
-           , line3 :: Line c3
-           , line4 :: Line c4
-           , line5 :: Line c5
-           }
+  = Stanza
+      { line1 :: Line c1
+      , line2 :: Line c2
+      , line3 :: Line c3
+      , line4 :: Line c4
+      , line5 :: Line c5
+      }
 
 data Line (c :: Nat) where
     LineA :: (c !~ x, c !~ y) => { hlA :: HalfLine c y
@@ -114,6 +115,6 @@ data Fall = Fall (LangString 'Ipa)
 --                Maybe (HalfLine a b)
 -- _mkHalfLine (Just f1) (Just f2) (Just f3) l1 l2 = Just $ HalfLine f1 f2 f3 l1 l2
 -- _mkHalfLine _ _ _ _ _ = Nothing
--- 
+--
 -- mkHalfLine :: [Fall] -> [Fall] -> [Fall] -> Lift a -> Lift b -> Maybe (HalfLine a b)
 -- mkHalfLine f1 f2 f3 = _mkHalfLine (fromList f1) (fromList f2) (fromList f3)
